@@ -25,6 +25,8 @@ const router = new Router(function () {
    * This will only be two single lines
    * If you did this right, you should see just 1 recipe card rendered to the screen
    */
+   document.querySelector('.section--recipe-cards').classList.add('shown');
+   document.querySelector('.section--recipe-expand').classList.remove('shown');
 });
 
 window.addEventListener('DOMContentLoaded', init);
@@ -119,11 +121,24 @@ function createRecipeCards() {
    * After this step you should see multiple cards rendered like the end of the last
    * lab
    */
+  for(let i = 1; i < recipes.length; i++){
+    const recipeCards = document.createElement('recipe-card');
+    recipeCards.data = recipeData[recipes[i]];
+    const pages = recipeData[recipes[i]]['page-name'];
+    router.addPage(page, function() {
+      document.querySelector('.section--recipe-cards').classList.remove('shown');
+      document.querySelector('.section--recipe-expand').classList.add('shown');
+      document.querySelector('recipe-expand').data = recipeData[recipes[i]];
+    });
+    bindRecipeCard(recipeCards, page);
+  
+    document.querySelector('.recipe-cards--wrapper').appendChild(recipeCards);
+  }
 }
 
 /**
  * Binds the click event listeners to the "Show more" button so that when it is
- * clicked more recipes will be shown
+ * clicked more recipes will be shown     
  */
 function bindShowMore() {
   const showMore = document.querySelector('.button--wrapper > button');
@@ -174,6 +189,14 @@ function bindEscKey() {
    * if the escape key is pressed, use your router to navigate() to the 'home'
    * page. This will let us go back to the home page from the detailed page.
    */
+  //might need to be window.addEventListener
+  document.addEventListener('keydown', event =>{
+    if(event.key == 'Escape'){
+      //not sure if this should be true or false
+      router.navigate('home',false);
+    }
+  });
+
 }
 
 /**
@@ -195,4 +218,12 @@ function bindPopstate() {
    * so your navigate() function does not add your going back action to the history,
    * creating an infinite loop
    */
+  window.addEventListener('popstate',event=>{
+    if(event.state){
+      router.navigate(event.state.page,true);
+    }
+    else{
+      router.navigate('home',true);
+    }
+  });
 }
